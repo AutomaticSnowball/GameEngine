@@ -1,7 +1,6 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
-#include "Shader.h"
 #include "maths\Matrix4.h"
 #include <iostream>
 #include <fstream>
@@ -31,8 +30,6 @@ float height = 720;
 vector<Model> block_models;
 vector<unsigned int> block_types;
 vector<glm::vec3> block_positions;
-void setRenderData(Chunk c_chunk, Shader s);
-void drawChunk(Chunk c,Shader s, glm::vec3 offset);
 
 Camera mainCamera;
 int main(void)
@@ -81,18 +78,12 @@ int main(void)
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback); /*Resizing the window. - Calls the function using the window context*/
 	cout << "GPU: " << glGetString(GL_VERSION) << endl;
 
-
-
-	Shader lightShader("src\\shaders\\vertex.vert", "src\\shaders\\light_frag.frag");
-	Shader baseShader("src\\shaders\\e_vertex.vert", "src\\shaders\\e_fragment.frag");
-
 	glEnable(GL_DEPTH_TEST); //To prevent panes from overlapping.
 
 
 	glm::ortho(0.0f, 800.0f, 0.0f, 600.0f, 0.1f, 100.0f);
 	glm::mat4 projection = glm::mat4(1.0f);
 	projection = glm::perspective(glm::radians(mainCamera.getFOV()), (float)width / (float)height, 0.01f, 100.0f); //The model positions relative to 1 and -1.
-	glm::mat4 model = glm::mat4(1.0f);
 
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED); //Hides cursor, records position.
 	glfwSetCursorPosCallback(window, mouse_callback);
@@ -105,13 +96,14 @@ int main(void)
 	sphereO.move(glm::vec3(0.0f, 2.0f, 0.0f));
 	sphereO.scale(glm::vec3(0.5f, 0.5f, 0.5f));
 	
-	mainCamera.setPos(0.0f, 5.0f, 0.0f);
+	mainCamera.setPos(0.0f, 0.0f, 3.0f);
 
 	//Generating world.
+	/*
 	World world;
 	world.setSize();
 	world.generate();
-	Chunk baseChunk = world.getChunk(0, 0);
+	*/
 	float timer = glfwGetTime();
 	float updateTime = 0;
 	int frames = 0;
@@ -131,7 +123,7 @@ int main(void)
 	block_texture.push_back("grass_specular.png");
 	Model sand("src\\models\\block.obj", block_texture);
 	rm.add(sand);
-	rm.add(world);
+	//rm.add(world);
 	/*
 	std::vector<std::string> dinoT;
 	dinoT.push_back("dino_diffuse.png");
@@ -146,8 +138,6 @@ int main(void)
 
 	//s.addObject(grassBlock);
 
-	Chunk viewChunk;
-	glm::vec3 prePos(10.0f, 0.0f, 10.0f);
 
 	bool editMode = false;
 	/* Loop until the user closes the window */
@@ -163,26 +153,15 @@ int main(void)
 			while (updateTime > 1.0f) {
 				//Every 60th of a second.
 
-				baseChunk = world.getChunk(mainCamera.getChunk().x, mainCamera.getChunk().y);
-				glm::vec2 nowChunk(mainCamera.getChunk().x, mainCamera.getChunk().y);
-				if (nowChunk != preChunk) {
-					//setRenderData(baseChunk, baseShader);
-					preChunk = nowChunk;
-				}
-				mainCamera.update(baseChunk);
+				mainCamera.update();
 
-
-				if (prePos.x != mainCamera.getPos().x || prePos.z != mainCamera.getPos().z) {
-					//Detects movement
-					//viewChunk = rm.getViewChunk(0, mainCamera.getChunk(), mainCamera.getBlock());
-					prePos = mainCamera.getPos();
-				}
+				//####RENDERING
+				rm.setMatrices(mainCamera.viewMatrix(), projection);
+				rm.render(s);
 
 				updateTime--;
 			}
 			frames++;
-
-
 			if (glfwGetTime() - timer > 1.0f) {
 				//Every 1 second.
 				timer++;
@@ -195,67 +174,8 @@ int main(void)
 		float radius = 1.0f;
 		float camX = sin(glfwGetTime() * radius);
 		float camZ = cos(glfwGetTime() * radius);
-		glm::mat4 view = mainCamera.viewMatrix();
 
-		s.setPointLightAttrib(0,"diffuse", glm::vec3(1.0f, (float)camX, (float)camZ));
-
-		rm.setMatrices(view, projection);
-		rm.render(s);
-
-		
-
-		model = glm::mat4(1.0f);
-		model = glm::scale(model, glm::vec3(0.5f, 0.5f, 0.5f));
-
-
-		/*
-		for each (Chunk c_chunk in world.getAllChunks()) {
-				unsigned int block_index = 0;
-				block_models.push_back(grass);
-				block_models.push_back(sand);
-				block_models.push_back(sphere);
-				for (unsigned int x = 0; x < 16; x++) {
-					for (unsigned int z = 0; z < 16; z++) {
-						if (c_chunk.getBlock(x, 1, z) == 0 || c_chunk.getBlock(x + 1, 0, z) == 0 || c_chunk.getBlock(x - 1, 0, z) == 0 || c_chunk.getBlock(x, 0, z + 1) == 0 || c_chunk.getBlock(x, 0, z - 1) == 0) {
-							//Checks if there is air surrounding blocks.
-							if (c_chunk.getBlock(x, 0, z) != 0) {
-								block_types.push_back(c_chunk.getBlock(x, 0, z) - 1);
-								block_positions.push_back(glm::vec3(x * 2, 0, z * 2));
-								block_index++;
-							}
-						}
-					}
-
-				}
-				if (block_index > 0) {
-					drawInstanced(block_models, block_types, block_positions, baseShader);
-					block_models.clear();
-					block_types.clear();
-					block_positions.clear();
-					block_index = 0;
-				}
-		}
-		*/
-
-		for (int x = 0; x < 16; x++) {
-			for (int z = 0; z < 16; z++) {
-
-				//rm.drawBlock(baseShader, rm.getBlock(0, x + mainCamera.getPos().x, 0, z + mainCamera.getPos().z), glm::vec3(x + mainCamera.getPos().x, 5.0f, z + mainCamera.getPos().z));
-			}
-		}
-		
-		//rm.drawBlock(baseShader, 1, glm::vec3(1.0f, 5.0f, 2.0f));
-		//drawChunk(rm, viewChunk, baseShader, mainCamera.getPos());
-		//drawChunk(rm, rm.getChunk(0, mainCamera.getChunk().x, mainCamera.getChunk().y), baseShader, glm::vec3(0.0f,0.0f,0.0f));
-		//drawInstanced(block_models, block_types, block_positions, baseShader);
-
-
-
-
-		//glDisable(GL_CULL_FACE);
-
-
-		
+	
 
 		/* Swap front and back buffers */
 		glfwSwapBuffers(window);
@@ -263,64 +183,11 @@ int main(void)
 		glfwPollEvents();
 	}
 
-
-
-	baseShader.deleteProgram();
-	lightShader.deleteProgram();
+	rm.end();
 
 	glfwTerminate();
 	return 0;
 }
-
-void setRenderData(Chunk c_chunk, Shader s) {
-	//Resources r
-
-	block_models.clear();
-	block_types.clear();
-	block_positions.clear();
-
-	std::vector < std::string > crateT;
-	crateT.push_back("b_grass_diffuse.png");
-	crateT.push_back("grass_specular.png");
-	Model grass("src\\models\\t_Crate.obj", crateT);
-	std::vector < std::string > sandT;
-	sandT.push_back("b_sand_diffuse.png");
-	sandT.push_back("grass_specular.png");
-	Model sand("src\\models\\t_Crate.obj", sandT);
-
-		block_models.push_back(grass);
-		block_models.push_back(sand);
-		for (unsigned int x = 0; x < 16; x++) {
-			for (unsigned int z = 0; z < 16; z++) {
-				if (c_chunk.getBlock(x, 1, z) == 0 || c_chunk.getBlock(x + 1, 0, z) == 0 || c_chunk.getBlock(x - 1, 0, z) == 0 || c_chunk.getBlock(x, 0, z + 1) == 0 || c_chunk.getBlock(x, 0, z - 1) == 0) {
-					//Checks if there is air surrounding blocks.
-					if (c_chunk.getBlock(x, 0, z) != 0) {
-						block_types.push_back(c_chunk.getBlock(x, 0, z) - 1);
-						block_positions.push_back(glm::vec3((16 * c_chunk.getStart()[0]) + x, 0, (16 * c_chunk.getStart()[1]) + z));
-						//+ (16 * c_chunk.getStart()[0])
-						//+ (16 * c_chunk.getStart()[1])
-					}
-				}
-			}
-
-		}
-}
-
-void drawChunk(ResourceManager rm, Chunk c, Shader s, glm::vec3 offset) {
-	for (int x = 0; x < 16; x++) {
-		for (int z = 0; z < 16; z++) {
-			if (c.getBlock(x, 0, z) != 0) {
-				Model m = rm.getModel(c.getBlock(x, 0, z) - 1);
-				glm::mat4 model = glm::mat4(1.0f);
-				model = glm::translate(model, glm::vec3(((16 * c.getStart()[0]) + x - 8) + offset.x, 0.0f, offset.z + ((16 * c.getStart()[1]) + z - 8)));
-				model = glm::scale(model, glm::vec3(0.5f, 0.5f, 0.5f));
-				s.setM4FV("model", model);
-				m.draw(s);
-			}
-		}
-	}
-}
-
 
 void drawInstanced(vector<Model> blockTypes, vector<unsigned int> type, vector<glm::vec3> pos, Shader s) {
 	vector<unsigned int> quantity;

@@ -1,26 +1,2 @@
 ﻿C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\IDE\VC\VCTargets\Microsoft.CppBuild.targets(387,5): warning MSB8028: The intermediate directory (Debug\) contains files shared from another project (DevelopmentA.vcxproj, MazeCrawler.vcxproj).  This can lead to incorrect clean and rebuild behavior.
-  Application.cpp
-c:\users\theo\documents\visual studio 2017\projects\gameengine - v1.0\developmenta\src\application.cpp(52): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
-c:\users\theo\documents\visual studio 2017\projects\gameengine - v1.0\developmenta\src\application.cpp(61): warning C4244: 'argument': conversion from 'float' to 'GLsizei', possible loss of data
-c:\users\theo\documents\visual studio 2017\projects\gameengine - v1.0\developmenta\src\application.cpp(119): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-c:\users\theo\documents\visual studio 2017\projects\gameengine - v1.0\developmenta\src\application.cpp(166): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-c:\users\theo\documents\visual studio 2017\projects\gameengine - v1.0\developmenta\src\application.cpp(173): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
-c:\users\theo\documents\visual studio 2017\projects\gameengine - v1.0\developmenta\src\application.cpp(203): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-c:\users\theo\documents\visual studio 2017\projects\gameengine - v1.0\developmenta\src\application.cpp(204): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-c:\users\theo\documents\visual studio 2017\projects\gameengine - v1.0\developmenta\src\application.cpp(335): warning C4018: '<': signed/unsigned mismatch
-c:\users\theo\documents\visual studio 2017\projects\gameengine - v1.0\developmenta\src\application.cpp(368): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
-c:\users\theo\documents\visual studio 2017\projects\gameengine - v1.0\developmenta\src\application.cpp(386): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
-c:\users\theo\documents\visual studio 2017\projects\gameengine - v1.0\developmenta\src\application.cpp(430): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-c:\users\theo\documents\visual studio 2017\projects\gameengine - v1.0\developmenta\src\application.cpp(431): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-c:\users\theo\documents\visual studio 2017\projects\gameengine - v1.0\developmenta\src\application.cpp(432): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
-c:\users\theo\documents\visual studio 2017\projects\gameengine - v1.0\developmenta\src\application.cpp(433): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
-c:\users\theo\documents\visual studio 2017\projects\gameengine - v1.0\developmenta\src\application.cpp(435): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
-  Generating Code...
-  Skipping... (no relevant changes detected)
-  Vector4f.cpp
-  Vector3f.cpp
-  Matrix4.cpp
-  World.cpp
-  Chunk.cpp
-  Camera.cpp
-  DevelopmentA.vcxproj -> C:\Users\theo\Documents\Visual Studio 2017\Projects\GameEngine - V1.0\Debug\GameEngine.exe
+  DevelopmentA.vcxproj -> C:\Users\theo\Desktop\GameEngine\Debug\GameEngine.exe

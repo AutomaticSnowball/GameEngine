@@ -23,30 +23,27 @@ ResourceManager::~ResourceManager()
 {
 }
 
-World ResourceManager::getWorld(unsigned int ID)
-{
-	return worlds[ID];
-}
-
 Model ResourceManager::getModel(unsigned int ID)
 {
 	return models[ID];
 }
 
-void ResourceManager::add(World w) {
-	worlds.push_back(w);
-}
 void ResourceManager::add(Model m) {
 	models.push_back(m);
 }
 void ResourceManager::reset() {
 	models.clear();
-	worlds.clear();
 }
 
 void ResourceManager::setMatrices(glm::mat4 _view, glm::mat4 _proj) {
 	w_view = _view;
 	w_projection = _proj;
+}
+
+void ResourceManager::end() {
+	for each (Shader s in shaders) {
+		s.deleteProgram();
+	}
 }
 
 void ResourceManager::renderAnimated(Scene sc) {
@@ -150,74 +147,6 @@ void ResourceManager::render(Scene s) {
 	}
 
 	glDisable(GL_CULL_FACE);
-}
-
-Chunk ResourceManager::getChunk(unsigned int ID, int x, int z)
-{
-	return worlds[ID].getChunk(x, z);
-}
-
-Chunk ResourceManager::getViewChunk(unsigned int ID, glm::vec2 p, glm::vec3 pos) {
-	Chunk c;
-	Chunk ca = getChunk(ID, p.x, p.y);
-	for (unsigned int x = 0; x < 16; x++) {
-		for (unsigned int z = 0; z < 16; z++) {
-			int chunk_x = ca.getStart()[0];
-			int chunk_z = ca.getStart()[1];
-			int b_x = pos.x - 8 + x;
-			if (b_x < 0) {
-				b_x += 16;
-				chunk_x = ca.getStart()[0] - 1;
-			}
-			else if (b_x > 15) {
-				b_x -= 16;
-				chunk_x = ca.getStart()[0] + 1;
-			}
-			int b_z = pos.z - 8 + z;
-			if (b_z < 0) {
-				b_z += 16;
-				chunk_z = ca.getStart()[1] - 1;
-			}
-			else if (b_z > 15) {
-				b_z -= 16;
-				chunk_z = ca.getStart()[1] + 1;
-			}
-			c.SetBlock(x, 0, z, getChunk(ID, chunk_x, chunk_z).getBlock(b_x, 0, b_z));
-
-		}
-	}
-	c.assignStart(0, 0);
-	return c;
-}
-
-unsigned int ResourceManager::getBlock(unsigned int ID, int x, int y, int z) {
-
-	glm::vec2 pos;
-	pos.x = (x + 0.5);
-	pos.y = (z + 0.5);
-	pos.x = pos.x / 16;
-	pos.y = pos.y / 16;
-	if (pos.x == -0) { pos.x = -1; }
-	if (pos.y == -0) { pos.y = -1; }
-
-	pos.x = floor(pos.x);
-	pos.y = floor(pos.y);
-
-	glm::vec3 blockPos = glm::vec3(x,y,z);
-	blockPos.x = round(blockPos.x);
-	blockPos.y = round(blockPos.y) - 1;
-	blockPos.z = round(blockPos.z);
-	if (blockPos.x == -0) {
-		blockPos.x = 0;
-	}
-	if (blockPos.z == -0) {
-		blockPos.z = 0;
-	}
-	blockPos.x = round(blockPos.x) + (16 * -pos.x);
-	blockPos.z = round(blockPos.z) + (16 * -pos.y);
-
-	
-	return getChunk(ID, pos.x, pos.y).getBlock(blockPos.x, 0, blockPos.z);
 }
 
 void ResourceManager::drawBlock(Shader s,unsigned int ID, glm::vec3 pos) {
