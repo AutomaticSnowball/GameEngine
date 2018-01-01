@@ -9,7 +9,7 @@ PointLight::PointLight()
 	colour_diff = c;
 	colour_amb = c;
 	colour_spec = c;
-	setModel(Model());
+	//setModel(Model());
 }
 
 PointLight::PointLight(glm::vec3 p)
@@ -19,7 +19,7 @@ PointLight::PointLight(glm::vec3 p)
 	colour_amb = c;
 	colour_spec = c;
 	moveTo(p);
-	setModel(Model());
+	//setModel(Model());
 }
 
 PointLight::PointLight(glm::vec3 p, glm::vec3 diffuse)
@@ -29,7 +29,7 @@ PointLight::PointLight(glm::vec3 p, glm::vec3 diffuse)
 	colour_amb = c;
 	colour_spec = c;
 	moveTo(p);
-	setModel(Model());
+	//setModel(Model());
 }
 
 

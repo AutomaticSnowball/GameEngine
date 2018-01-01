@@ -13,6 +13,9 @@
 
 #include <cstdlib> //Random number generation
 
+
+
+
 using namespace std;
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
@@ -55,6 +58,13 @@ int main(void)
 
 	/* Make the window's context current */
 	glfwMakeContextCurrent(window);
+
+	//width = 1920;
+	//height = 1080;
+	
+	glfwSetWindowSize(window, width, height);
+	glfwSetWindowPos(window, 0, 0);
+
 	glViewport(0, 0, width, height);
 
 	if (glewInit() != GLEW_OK) {
@@ -64,8 +74,6 @@ int main(void)
 	}
 
 	//glEnable(GL_MULTISAMPLE);
-
-
 
 	ResourceManager rm;
 
@@ -106,11 +114,11 @@ int main(void)
 	*/
 	float timer = glfwGetTime();
 	float updateTime = 0;
-	int frames = 0;
 
 	//setRenderData(baseChunk, baseShader);
 	glm::vec2 preChunk(0,0);
 
+	std::cout << glfwGetTime() << std::endl;
 
 	std::vector < std::string > block_texture;
 	block_texture.clear();
@@ -124,26 +132,32 @@ int main(void)
 	Model sand("src\\models\\block.obj", block_texture);
 	rm.add(sand);
 	//rm.add(world);
-	/*
+	
 	std::vector<std::string> dinoT;
 	dinoT.push_back("dino_diffuse.png");
 	Model dino("src\\models\\dinosaur.obj", dinoT);
 	Object grassBlock(dino);
 	grassBlock.scale(glm::vec3(0.2f,0.2f,0.2f));
-	
 
-	
-	*/
+	Object newObj;
+	newObj.setModel(grass);
+	newObj.moveTo(glm::vec3(0.0f,7.0f,3.0f));
+
+	std::cout << glfwGetTime() << std::endl;
 	Scene s;
+	std::cout << glfwGetTime() << std::endl;
 
-	//s.addObject(grassBlock);
+	s.addObject(grassBlock);
 
+
+	int frames = 0;
 
 	bool editMode = false;
+
+
 	/* Loop until the user closes the window */
 	while (!glfwWindowShouldClose(window))
 	{
-		processInput(window);
 		if (!editMode) {
 			//Game mode
 			float currentTime = glfwGetTime();
@@ -154,6 +168,10 @@ int main(void)
 				//Every 60th of a second.
 
 				mainCamera.update();
+
+				for (unsigned int i = 0; i < 4; i++) {
+					s.setPointLightAttrib(i, "diffuse", glm::vec3(sin(glfwGetTime()), cos(glfwGetTime()), sin(glfwGetTime())));
+				}
 
 				//####RENDERING
 				rm.setMatrices(mainCamera.viewMatrix(), projection);
@@ -169,13 +187,8 @@ int main(void)
 				frames = 0;
 			}
 		}
+		processInput(window);
 
-
-		float radius = 1.0f;
-		float camX = sin(glfwGetTime() * radius);
-		float camZ = cos(glfwGetTime() * radius);
-
-	
 
 		/* Swap front and back buffers */
 		glfwSwapBuffers(window);

@@ -25,16 +25,8 @@ void main()
 	vec4 localPos = vec4(0.0);
 	vec4 localNormal = vec4(0.0);
 	
-	for (int i=0; i < 1; i++) {
-	mat4 jointTransform;
-		if (i == 0) {
-			jointTransform = jointTransforms[aJointIndices.x];
-		} else if (i == 1) {
-			jointTransform = jointTransforms[aJointIndices.y];
-		} else if (i == 2) {
-			jointTransform = jointTransforms[aJointIndices.z];
-		}
-		
+	for (int i=0; i < MAX_WEIGHTS; i++) {
+		mat4 jointTransform = jointTransforms[aJointIndices[i]];
 		vec4 posePos = jointTransform * vec4(aPos, 1.0);
 		localPos += posePos * aJointWeights[i];
 		

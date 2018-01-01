@@ -16,6 +16,7 @@ ResourceManager::ResourceManager()
 	animated[0].animate(0);
 
 	glClearColor(0.1f, 0.6f, 0.6f, 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 }
 
 
@@ -49,23 +50,6 @@ void ResourceManager::end() {
 void ResourceManager::renderAnimated(Scene sc) {
 	//Animated
 	shaders[2].use();
-	shaders[2].setM4FV("view", w_view);
-	shaders[2].setM4FV("projection", w_projection);
-	shaders[2].setV3F("l_directional.direction", -0.2f, -1.0f, -0.3f);
-	shaders[2].setV3F("l_directional.ambient", 0.05f, 0.05f, 0.05f);
-	shaders[2].setV3F("l_directional.diffuse", 0.4f, 0.4f, 0.4f);
-	shaders[2].setV3F("l_directional.specular", 0.5f, 0.5f, 0.5f);
-	for (int i = 0; i < 100; i++) {
-		if (sc.getPointLight(i).isActive()) {
-			shaders[2].setV3F("l_points[" + std::to_string(i) + "].position", sc.getPointLight(i).getPos().x, sc.getPointLight(i).getPos().y, sc.getPointLight(i).getPos().z);
-			shaders[2].setV3F("l_points[" + std::to_string(i) + "].ambient", 0.05f, 0.05f, 0.05f);
-			shaders[2].setV3F("l_points[" + std::to_string(i) + "].diffuse", sc.getPointLight(i).getDiffuse().x, sc.getPointLight(i).getDiffuse().y, sc.getPointLight(i).getDiffuse().z);
-			shaders[2].setV3F("l_points[" + std::to_string(i) + "].specular", 1.0f, 1.0f, 1.0f);
-			shaders[2].setF("l_points[" + std::to_string(i) + "].constant", 1.0f);
-			shaders[2].setF("l_points[" + std::to_string(i) + "].linear", 0.09f);
-			shaders[2].setF("l_points[" + std::to_string(i) + "].quadratic", 0.032f);
-		}
-	}
 	unsigned int index = 0;
 	for each (AnimatedModel am in animated) {
 		unsigned int pos = 0;
@@ -91,26 +75,30 @@ void ResourceManager::render(Scene s) {
 
 	glEnable(GL_DEPTH_TEST);
 
-	renderAnimated(s);
+	//renderAnimated(s);
 
 	//Objects
-	shaders[1].use();
-	shaders[1].setM4FV("view", w_view);
-	shaders[1].setM4FV("projection", w_projection);
-	shaders[1].setF("material.shininess", 64.0f);
-	shaders[1].setV3F("l_directional.direction", -0.2f, -1.0f, -0.3f);
-	shaders[1].setV3F("l_directional.ambient", 0.05f, 0.05f, 0.05f);
-	shaders[1].setV3F("l_directional.diffuse", 0.4f, 0.4f, 0.4f);
-	shaders[1].setV3F("l_directional.specular", 0.5f, 0.5f, 0.5f);
-	for (int i = 0; i < 100; i++) {
-		if (s.getPointLight(i).isActive()) {
-			shaders[1].setV3F("l_points[" + std::to_string(i) + "].position", s.getPointLight(i).getPos().x, s.getPointLight(i).getPos().y, s.getPointLight(i).getPos().z);
-			shaders[1].setV3F("l_points[" + std::to_string(i) + "].ambient", 0.05f, 0.05f, 0.05f);
-			shaders[1].setV3F("l_points[" + std::to_string(i) + "].diffuse", s.getPointLight(i).getDiffuse().x, s.getPointLight(i).getDiffuse().y, s.getPointLight(i).getDiffuse().z);
-			shaders[1].setV3F("l_points[" + std::to_string(i) + "].specular", 1.0f, 1.0f, 1.0f);
-			shaders[1].setF("l_points[" + std::to_string(i) + "].constant", 1.0f);
-			shaders[1].setF("l_points[" + std::to_string(i) + "].linear", 0.09f);
-			shaders[1].setF("l_points[" + std::to_string(i) + "].quadratic", 0.032f);
+	for (unsigned int i = 1; i < 3; i++) {
+		shaders[i].use();
+		shaders[i].setM4FV("view", w_view);
+		shaders[i].setM4FV("projection", w_projection);
+		shaders[i].setF("material.shininess", 64.0f);
+		shaders[i].setV3F("l_directional.direction", -0.2f, -1.0f, -0.3f);
+		shaders[i].setV3F("l_directional.ambient", 0.05f, 0.05f, 0.05f);
+		shaders[i].setV3F("l_directional.diffuse", 0.4f, 0.4f, 0.4f);
+		shaders[i].setV3F("l_directional.specular", 0.5f, 0.5f, 0.5f);
+		unsigned int index = 0;
+		for each (PointLight pl in s.getPointLights()) {
+			if (pl.isActive()) {
+				shaders[i].setV3F("l_points[" + std::to_string(index) + "].position", pl.getPos().x, pl.getPos().y, pl.getPos().z);
+				shaders[i].setV3F("l_points[" + std::to_string(index) + "].ambient", 0.05f, 0.05f, 0.05f);
+				shaders[i].setV3F("l_points[" + std::to_string(index) + "].diffuse", pl.getDiffuse().x, pl.getDiffuse().y, pl.getDiffuse().z);
+				shaders[i].setV3F("l_points[" + std::to_string(index) + "].specular", 1.0f, 1.0f, 1.0f);
+				shaders[i].setF("l_points[" + std::to_string(index) + "].constant", 1.0f);
+				shaders[i].setF("l_points[" + std::to_string(index) + "].linear", 0.09f);
+				shaders[i].setF("l_points[" + std::to_string(index) + "].quadratic", 0.032f);
+				index++;
+			}
 		}
 	}
 
@@ -118,6 +106,7 @@ void ResourceManager::render(Scene s) {
 	glCullFace(GL_FRONT);
 	glFrontFace(GL_CW);
 
+	shaders[1].use();
 	glm::mat4 model;
 	for each (Object o in s.getObjects()) {
 		model = glm::mat4(1.0f);
@@ -132,17 +121,14 @@ void ResourceManager::render(Scene s) {
 	shaders[0].use();
 	shaders[0].setM4FV("view", w_view);
 	shaders[0].setM4FV("projection", w_projection);
-	for (int i = 0; i < 100; i++) {
-		if (s.getPointLight(i).isActive() == true) {
-			shaders[0].setV3F("light_colour", s.getPointLight(i).getDiffuse().x, s.getPointLight(i).getDiffuse().y, s.getPointLight(i).getDiffuse().z);
+	for each (PointLight pl in s.getPointLights()) {
+		if (pl.isActive() == true) {
+			shaders[0].setV3F("light_colour", pl.getDiffuse().x, pl.getDiffuse().y, pl.getDiffuse().z);
 			model = glm::mat4(1.0f);
-			model = glm::translate(model, s.getPointLight(i).getPos());
+			model = glm::translate(model, pl.getPos());
 			model = glm::scale(model, glm::vec3(0.2f));
 			shaders[0].setM4FV("model", model);
 			models[0].draw(shaders[0]);
-		}
-		else {
-			break;
 		}
 	}
 
